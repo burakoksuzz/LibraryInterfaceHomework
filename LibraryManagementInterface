@@ -1,0 +1,178 @@
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+
+public class KutuphaneYonetimSistemi extends JFrame {
+    private JTextField kitapAdiField, yazarField, sayfaSayisiField, aramaField;
+    private JTextArea sonuclarArea;
+    private ArrayList<Kitap> kitapListesi;
+
+    public KutuphaneYonetimSistemi() {
+        super("Kütüphane Yönetim Sistemi");
+
+        kitapListesi = new ArrayList<>();
+
+        JLabel kitapAdiLabel = new JLabel("Kitap Adı:");
+        kitapAdiField = new JTextField(20);
+
+        JLabel yazarLabel = new JLabel("Yazar:");
+        yazarField = new JTextField(20);
+
+        JLabel sayfaSayisiLabel = new JLabel("Sayfa Sayısı:");
+        sayfaSayisiField = new JTextField(5);
+
+        JButton kitapEkleButton = new JButton("Kitap Ekle");
+        kitapEkleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                kitapEkleActionPerformed(e);
+            }
+        });
+
+        JButton kitaplariListeleButton = new JButton("Kitapları Listele");
+        kitaplariListeleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                kitaplariListeleActionPerformed(e);
+            }
+        });
+
+        JButton kitapSilButton = new JButton("Kitap Sil");
+        kitapSilButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                kitapSilActionPerformed(e);
+            }
+        });
+
+        aramaField = new JTextField(20);
+        JButton araButton = new JButton("Ara");
+        araButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                aramaActionPerformed(e);
+            }
+        });
+
+        sonuclarArea = new JTextArea(10, 30);
+        sonuclarArea.setEditable(false);
+
+        JPanel panel = new JPanel();
+        panel.add(kitapAdiLabel);
+        panel.add(kitapAdiField);
+        panel.add(yazarLabel);
+        panel.add(yazarField);
+        panel.add(sayfaSayisiLabel);
+        panel.add(sayfaSayisiField);
+        panel.add(kitapEkleButton);
+        panel.add(kitaplariListeleButton);
+        panel.add(kitapSilButton);
+        panel.add(aramaField);
+        panel.add(araButton);
+
+        JScrollPane scrollPane = new JScrollPane(sonuclarArea);
+
+        setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+        add(panel);
+        add(scrollPane);
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private void kitapEkleActionPerformed(ActionEvent event) {
+        String kitapAdi = kitapAdiField.getText();
+        String yazar = yazarField.getText();
+        int sayfaSayisi = Integer.parseInt(sayfaSayisiField.getText());
+
+        Kitap yeniKitap = new Kitap(kitapAdi, yazar, sayfaSayisi);
+        kitapListesi.add(yeniKitap);
+
+        String yeniSonuc = "Kitap Adı: " + yeniKitap.getKitapAdi() +
+                ", Yazar: " + yeniKitap.getYazar() +
+                ", Sayfa Sayısı: " + yeniKitap.getSayfaSayisi() + "\n";
+        sonuclarArea.append(yeniSonuc);
+
+        kitapAdiField.setText("");
+        yazarField.setText("");
+        sayfaSayisiField.setText("");
+    }
+
+    private void kitaplariListeleActionPerformed(ActionEvent event) {
+        sonuclarArea.setText(""); 
+
+        for (Kitap kitap : kitapListesi) {
+            String kitapBilgisi = "Kitap Adı: " + kitap.getKitapAdi() +
+                    ", Yazar: " + kitap.getYazar() +
+                    ", Sayfa Sayısı: " + kitap.getSayfaSayisi() + "\n";
+            sonuclarArea.append(kitapBilgisi);
+        }
+    }
+
+    private void kitapSilActionPerformed(ActionEvent event) {
+        String kitapAdi = aramaField.getText();
+
+        for (Kitap kitap : kitapListesi) {
+            if (kitap.getKitapAdi().equalsIgnoreCase(kitapAdi)) {
+                kitapListesi.remove(kitap);
+                sonuclarArea.setText("Kitap silindi: " + kitapAdi);
+                return;
+            }
+        }
+
+        sonuclarArea.setText("Kitap bulunamadı: " + kitapAdi);
+    }
+
+    private void aramaActionPerformed(ActionEvent event) {
+        sonuclarArea.setText(""); // Önceki sonuçları temizle
+
+        String anahtarKelime = aramaField.getText().toLowerCase();
+
+        for (Kitap kitap : kitapListesi) {
+            String kitapBilgisi = "Kitap Adı: " + kitap.getKitapAdi() +
+                    ", Yazar: " + kitap.getYazar() +
+                    ", Sayfa Sayısı: " + kitap.getSayfaSayisi() + "\n";
+
+            
+            if (kitapBilgisi.toLowerCase().contains(anahtarKelime)) {
+                sonuclarArea.append(kitapBilgisi);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new KutuphaneYonetimSistemi();
+            }
+        });
+    }
+
+    private class Kitap {
+        private String kitapAdi;
+        private String yazar;
+        private int sayfaSayisi;
+
+        public Kitap(String kitapAdi, String yazar, int sayfaSayisi) {
+            this.kitapAdi = kitapAdi;
+            this.yazar = yazar;
+            this.sayfaSayisi = sayfaSayisi;
+        }
+
+        public String getKitapAdi() {
+            return kitapAdi;
+        }
+
+        public String getYazar() {
+            return yazar;
+        }
+
+        public int getSayfaSayisi() {
+            return sayfaSayisi;
+        }
+    }
+}
